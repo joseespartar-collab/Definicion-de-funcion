@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artefacto Interactivo: Funciones y Pares Ordenados</title>
+    <style>
+        :root {
+            --bg-color: #050508;
+            --card-bg: #0d0e15;
+            --border-color: #1a1c29;
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff007f;
+            --neon-yellow: #ffe600;
+            --neon-green: #39ff14;
+            --text-color: #f0f4f8;
+            --subtext-color: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: var(--subtext-color);
+            font-size: 1rem;
+        }
+
+        /* Nav Tabs & Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--subtext-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--text-color);
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .tab-btn.active.level-2 {
+            background: rgba(255, 0, 127, 0.1);
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .btn-reset {
+            background: rgba(255, 230, 0, 0.1);
+            border: 1px solid var(--neon-yellow);
+            color: var(--neon-yellow);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: var(--neon-yellow);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 230, 0, 0.5);
+        }
+
+        /* Content Layout */
+        .level-content {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .level-content.active {
+            display: grid;
+        }
+
+        @media (min-width: 850px) {
+            .level-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h2 {
+            color: var(--neon-yellow);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exercise-box {
+            background: #000000;
+            border-left: 4px solid var(--neon-cyan);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .level-2 .exercise-box {
+            border-left-color: var(--neon-pink);
+        }
+
+        .math-expr {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+        }
+
+        .level-2 .math-expr {
+            color: var(--neon-pink);
+        }
+
+        /* Options & Form */
+        .question-group {
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 12px;
+            accent-color: var(--neon-cyan);
+            width: 18px;
+            height: 18px;
+        }
+
+        .level-2 .option-item input[type="radio"] {
+            accent-color: var(--neon-pink);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--neon-cyan);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .btn:hover {
+            background: #4df7ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+        }
+
+        .level-2 .btn {
+            background: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+        }
+
+        .level-2 .btn:hover {
+            background: #ff4da6;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+        }
+
+        /* Feedback Box */
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background: rgba(255, 0, 127, 0.1);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        /* Canvas / Canvas Container */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        canvas {
+            background-color: #000000;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        .graph-legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .step-container {
+            display: none;
+        }
+
+        .step-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Funciones y Pares Ordenados</h1>
+        <p class="subtitle">Generador Didáctico de Ejercicios Dinámicos</p>
+    </header>
+
+    <!-- Navegación y Botón de Reinicio -->
+    <div class="controls">
+        <button class="tab-btn active" onclick="switchLevel(1)">Nivel 1: Identificación Simple</button>
+        <button class="tab-btn level-2" onclick="switchLevel(2)">Nivel 2: Sistema con 2 Variables</button>
+        <button class="btn-reset" onclick="resetCurrentLevel()">🔄 Nuevo Ejercicio</button>
+    </div>
+
+    <!-- NIVEL 1 -->
+    <div id="level-1" class="level-content active">
+        <div class="card">
+            <h2><span>1.</span> Análisis de Relación</h2>
+            <div class="exercise-box" id="l1-expr-box">
+                <!-- Se genera con JS -->
+            </div>
+
+            <form id="form-l1" onsubmit="event.preventDefault(); checkLevel1();">
+                <div class="question-group">
+                    <p class="question-title">¿La relación R representa una FUNCIÓN?</p>
+                    <div class="options-list" id="l1-q1-options"></div>
+                </div>
+
+                <div class="question-group">
+                    <p class="question-title">¿Cuál es el Dominio Dom(R)?</p>
+                    <div class="options-list" id="l1-q2-options"></div>
+                </div>
+
+                <button type="submit" class="btn">Verificar Respuestas</button>
+            </form>
+
+            <div id="feedback-l1" class="feedback-box"></div>
+        </div>
+
+        <div class="card canvas-container">
+            <h2><span>📊</span> Plano Cartesiano</h2>
+            <canvas id="canvas-l1" width="400" height="400"></canvas>
+            <div class="graph-legend">
+                <div class="legend-item">
+                    <div class="color-dot" style="background: var(--neon-cyan);"></div>
+                    <span>Puntos de la relación</span>
+                </div>
+                <div class="legend-item" id="legend-l1-conflict" style="display:none;">
+                    <div class="color-dot" style="background: var(--neon-pink);"></div>
+                    <span>Conflicto (Falla Unicidad)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NIVEL 2 -->
+    <div id="level-2" class="level-content level-2">
+        <div class="card">
+            <h2><span>2.</span> Determinación con Variables</h2>
+            <div class="exercise-box" id="l2-expr-box">
+                <!-- Se genera con JS -->
+            </div>
+
+            <!-- Paso 1 -->
+            <div id="l2-step1" class="step-container active">
+                <div class="question-group">
+                    <p class="question-title" id="l2-q1-title">Paso 1: Por unicidad de función, halla "a".</p>
+                    <div class="options-list" id="l2-q1-options"></div>
+                </div>
+                <button type="button" class="btn" onclick="checkL2Step1()">Siguiente Paso</button>
+            </div>
+
+            <!-- Paso 2 -->
+            <div id="l2-step2" class="step-container">
+                <div class="question-group">
+                    <p class="question-title" id="l2-q2-title">Paso 2: Halla "b" y los elementos explícitos de f.</p>
+                    <div class="options-list" id="l2-q2-options"></div>
+                </div>
+                <button type="button" class="btn" onclick="checkL2Step2()">Siguiente Paso</button>
+            </div>
+
+            <!-- Paso 3 -->
+            <div id="l2-step3" class="step-container">
+                <div class="question-group">
+                    <p class="question-title">Paso 3: Determina el Dominio y el Rango de f.</p>
+                    <div class="options-list" id="l2-q3-options"></div>
+                </div>
+                <button type="button" class="btn" onclick="checkL2Step3()">Finalizar y Graficar</button>
+            </div>
+
+            <div id="feedback-l2" class="feedback-box"></div>
+        </div>
+
+        <div class="card canvas-container">
+            <h2><span>📈</span> Gráfica de la Función Final</h2>
+            <canvas id="canvas-l2" width="400" height="400"></canvas>
+            <div class="graph-legend">
+                <div class="legend-item">
+                    <div class="color-dot" style="background: var(--neon-pink);"></div>
+                    <span>Puntos Explícitos de f</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentLevel = 1;
+    let l1Data = {};
+    let l2Data = {};
+
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function switchLevel(level) {
+        currentLevel = level;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.level-content').forEach(c => c.classList.remove('active'));
+
+        if (level === 1) {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('level-1').classList.add('active');
+            if(!l1Data.points) generateLevel1();
+            else drawGraphL1();
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('level-2').classList.add('active');
+            if(!l2Data.valA) generateLevel2();
+            else drawGraphL2(l2Data.completed || false);
+        }
+    }
+
+    function resetCurrentLevel() {
+        if(currentLevel === 1) generateLevel1();
+        else generateLevel2();
+    }
+
+    // --- GENERADOR NIVEL 1 ---
+    function generateLevel1() {
+        document.getElementById('feedback-l1').style.display = 'none';
+        const isFunction = Math.random() < 0.5;
+        
+        let x1 = randInt(1, 3), y1 = randInt(2, 7);
+        let x2 = x1 + randInt(1, 2), y2 = randInt(2, 7);
+        let x3 = x2 + randInt(1, 2), y3 = randInt(2, 7);
+        let x4, y4;
+
+        if(!isFunction) {
+            x4 = x2; // Repite primera componente de x2
+            y4 = (y2 === 8) ? y2 - 2 : y2 + 1; // Asegura segunda componente distinta
+        } else {
+            x4 = x3 + randInt(1, 2);
+            y4 = randInt(2, 7);
+        }
+
+        const points = [{x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3}, {x: x4, y: y4}];
+        const domSet = [...new Set(points.map(p => p.x))].sort((a,b)=>a-b);
+        
+        l1Data = { isFunction, points, domSet, conflictX: !isFunction ? x2 : null };
+
+        document.getElementById('l1-expr-box').innerHTML = `
+            Dado el conjunto de pares ordenados:<br>
+            <span class="math-expr">R = {${points.map(p => `(${p.x}; ${p.y})`).join(', ')}}</span>
+        `;
+
+        // Pregunta 1
+        const q1Correct = isFunction 
+            ? "Sí, porque a cada elemento del dominio le corresponde una única imagen."
+            : `No, porque el elemento ${x2} del dominio tiene dos imágenes distintas.`;
+        const q1Options = shuffle([
+            { text: q1Correct, correct: true },
+            { text: isFunction ? `No, porque el elemento ${x2} se repite.` : "Sí, porque todos los pares son números enteros.", correct: false },
+            { text: "Sí, porque no hay números negativos.", correct: false }
+        ]);
+
+        document.getElementById('l1-q1-options').innerHTML = q1Options.map((opt, i) => `
+            <label class="option-item">
+                <input type="radio" name="q1_1" value="${opt.correct ? 'C' : 'I_' + i}">
+                ${opt.text}
+            </label>
+        `).join('');
+
+        // Pregunta 2
+        const correctDomStr = `{${domSet.join(', ')}}`;
+        const wrongDom1 = `{${points.map(p => p.y).filter((v,i,a)=>a.indexOf(v)===i).sort().join(', ')}}`;
+        const wrongDom2 = `{${points.map(p => p.x).join(', ')}}`;
+
+        const q2Options = shuffle([
+            { text: `Dom(R) = ${correctDomStr}`, correct: true },
+            { text: `Dom(R) = ${wrongDom1}`, correct: false },
+            { text: `Dom(R) = ${wrongDom2}`, correct: false }
+        ]);
+
+        document.getElementById('l1-q2-options').innerHTML = q2Options.map((opt, i) => `
+            <label class="option-item">
+                <input type="radio" name="q1_2" value="${opt.correct ? 'C' : 'I_' + i}">
+                ${opt.text}
+            </label>
+        `).join('');
+
+        drawGraphL1();
+    }
+
+    function checkLevel1() {
+        const q1 = document.querySelector('input[name="q1_1"]:checked');
+        const q2 = document.querySelector('input[name="q1_2"]:checked');
+        const feedback = document.getElementById('feedback-l1');
+
+        if (!q1 || !q2) {
+            feedback.className = 'feedback-box incorrect';
+            feedback.innerHTML = 'Por favor responde ambas preguntas.';
+            return;
+        }
+
+        if (q1.value === 'C' && q2.value === 'C') {
+            feedback.className = 'feedback-box correct';
+            feedback.innerHTML = `<strong>¡Excelente!</strong><br>${l1Data.isFunction ? 'La relación SÍ es una función.' : 'La relación NO es función por falta de unicidad en x = ' + l1Data.conflictX}.<br>Dom(R) = {${l1Data.domSet.join(', ')}}.`;
+        } else {
+            feedback.className = 'feedback-box incorrect';
+            feedback.innerHTML = '<strong>Respuesta Incorrecta:</strong> Revisa si alguna primera componente $x$ se repite con distintos valores de $y$.';
+        }
+    }
+
+    function drawGraphL1() {
+        const canvas = document.getElementById('canvas-l1');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid & Axes
+        ctx.strokeStyle = '#1a1c29';
+        for(let x = 0; x < w; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+        for(let y = 0; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+        const ox = 50, oy = 350, scale = 35;
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(20, oy); ctx.lineTo(w - 20, oy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ox, 20); ctx.lineTo(ox, h - 20); ctx.stroke();
+
+        ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif';
+        for (let i = 1; i <= 8; i++) {
+            ctx.fillText(i, ox + i * scale - 4, oy + 20);
+            ctx.fillText(i, ox - 20, oy - i * scale + 4);
+        }
+
+        const legendConf = document.getElementById('legend-l1-conflict');
+        if(!l1Data.isFunction) legendConf.style.display = 'flex';
+        else legendConf.style.display = 'none';
+
+        // Draw Line for failure
+        if(!l1Data.isFunction) {
+            ctx.strokeStyle = 'rgba(255, 0, 127, 0.4)';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(ox + l1Data.conflictX * scale, oy - 1 * scale);
+            ctx.lineTo(ox + l1Data.conflictX * scale, oy - 8 * scale);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        l1Data.points.forEach(p => {
+            const isConf = !l1Data.isFunction && p.x === l1Data.conflictX;
+            const color = isConf ? '#ff007f' : '#00f3ff';
+            const px = ox + p.x * scale, py = oy - p.y * scale;
+
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowColor = color; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`(${p.x};${p.y})`, px + 8, py - 8);
+        });
+    }
+
+    // --- GENERADOR NIVEL 2 ---
+    function generateLevel2() {
+        document.getElementById('feedback-l2').style.display = 'none';
+        document.querySelectorAll('#level-2 .step-container').forEach(s => s.classList.remove('active'));
+        document.getElementById('l2-step1').classList.add('active');
+
+        const xShared = randInt(2, 3);
+        const k = randInt(2, 4); // a + k = valY
+        const valA = randInt(2, 5);
+        const valY = valA + k;
+        
+        const m = randInt(1, 3); // b = a + m
+        const valB = valA + m;
+        
+        const x3 = xShared + randInt(1, 2);
+        const y3 = randInt(3, 7);
+        const y4 = valA;
+
+        l2Data = {
+            xShared, k, valA, valY, m, valB, x3, y3, y4,
+            completed: false
+        };
+
+        document.getElementById('l2-expr-box').innerHTML = `
+            Se tiene la siguiente relación de pares ordenados:<br>
+            <span class="math-expr">f = {(${xShared}; a + ${k}), (${xShared}; ${valY}), (b; ${y3}), (${x3}; a)}</span><br><br>
+            <strong>Condición:</strong> <span style="color: var(--neon-yellow);">f ES UNA FUNCIÓN</span> y además <span class="math-expr">b = a + ${m}</span>.
+        `;
+
+        // Step 1 Options
+        document.getElementById('l2-q1-title').innerHTML = `Paso 1: Por unicidad de función, halla "a" (Igua la 2ª componente de x = ${xShared}).`;
+        const q1Opts = shuffle([
+            { text: `a = ${valA}`, correct: true },
+            { text: `a = ${valA + 2}`, correct: false },
+            { text: `a = ${valY}`, correct: false }
+        ]);
+        document.getElementById('l2-q1-options').innerHTML = q1Opts.map((o, i) => `
+            <label class="option-item"><input type="radio" name="q2_1" value="${o.correct ? 'C' : 'I_' + i}">${o.text}</label>
+        `).join('');
+
+        // Step 2 Options
+        document.getElementById('l2-q2-title').innerHTML = `Paso 2: Con a = ${valA}, halla "b" y la función explícita (b = a + ${m}).`;
+        const explicitStr = `{(${xShared}; ${valY}), (${valB}; ${y3}), (${x3}; ${valA})}`;
+        const q2Opts = shuffle([
+            { text: `b = ${valB} | f = ${explicitStr}`, correct: true },
+            { text: `b = ${valB - 1} | f = {(${xShared}; ${valY}), (${valB-1}; ${y3})}`, correct: false },
+            { text: `b = ${valB} | f = {(${xShared}; ${valY}), (${xShared}; ${valY}), (${valB}; ${y3})}`, correct: false }
+        ]);
+        document.getElementById('l2-q2-options').innerHTML = q2Opts.map((o, i) => `
+            <label class="option-item"><input type="radio" name="q2_2" value="${o.correct ? 'C' : 'I_' + i}">${o.text}</label>
+        `).join('');
+
+        // Step 3 Options
+        const domArr = [...new Set([xShared, valB, x3])].sort((a,b)=>a-b);
+        const ranArr = [...new Set([valY, y3, valA])].sort((a,b)=>a-b);
+        const q3Opts = shuffle([
+            { text: `Dom(f) = {${domArr.join(', ')}} ; Ran(f) = {${ranArr.join(', ')}}`, correct: true },
+            { text: `Dom(f) = {${ranArr.join(', ')}} ; Ran(f) = {${domArr.join(', ')}}`, correct: false },
+            { text: `Dom(f) = {${domArr.join(', ')}, ${valA}} ; Ran(f) = {${ranArr.join(', ')}}`, correct: false }
+        ]);
+        document.getElementById('l2-q3-options').innerHTML = q3Opts.map((o, i) => `
+            <label class="option-item"><input type="radio" name="q2_3" value="${o.correct ? 'C' : 'I_' + i}">${o.text}</label>
+        `).join('');
+
+        drawGraphL2(false);
+    }
+
+    function checkL2Step1() {
+        const q = document.querySelector('input[name="q2_1"]:checked');
+        const feedback = document.getElementById('feedback-l2');
+        if (!q) return;
+
+        if (q.value === 'C') {
+            feedback.className = 'feedback-box correct';
+            feedback.innerHTML = `<strong>¡Correcto!</strong> a + ${l2Data.k} = ${l2Data.valY} &rArr; a = ${l2Data.valA}.`;
+            setTimeout(() => {
+                feedback.style.display = 'none';
+                document.getElementById('l2-step1').classList.remove('active');
+                document.getElementById('l2-step2').classList.add('active');
+            }, 1200);
+        } else {
+            feedback.className = 'feedback-box incorrect';
+            feedback.innerHTML = `<strong>Incorrecto:</strong> Plantea a + ${l2Data.k} = ${l2Data.valY}.`;
+        }
+    }
+
+    function checkL2Step2() {
+        const q = document.querySelector('input[name="q2_2"]:checked');
+        const feedback = document.getElementById('feedback-l2');
+        if (!q) return;
+
+        if (q.value === 'C') {
+            feedback.className = 'feedback-box correct';
+            feedback.innerHTML = `<strong>¡Correcto!</strong> b = ${l2Data.valA} + ${l2Data.m} = ${l2Data.valB}.`;
+            setTimeout(() => {
+                feedback.style.display = 'none';
+                document.getElementById('l2-step2').classList.remove('active');
+                document.getElementById('l2-step3').classList.add('active');
+            }, 1200);
+        } else {
+            feedback.className = 'feedback-box incorrect';
+            feedback.innerHTML = `<strong>Incorrecto:</strong> Evalúa b = ${l2Data.valA} + ${l2Data.m}.`;
+        }
+    }
+
+    function checkL2Step3() {
+        const q = document.querySelector('input[name="q2_3"]:checked');
+        const feedback = document.getElementById('feedback-l2');
+        if (!q) return;
+
+        if (q.value === 'C') {
+            feedback.className = 'feedback-box correct';
+            feedback.innerHTML = '<strong>¡Felicitaciones! Has resuelto el ejercicio.</strong>';
+            l2Data.completed = true;
+            drawGraphL2(true);
+        } else {
+            feedback.className = 'feedback-box incorrect';
+            feedback.innerHTML = '<strong>Incorrecto:</strong> Revisa los conjuntos del dominio (primeras componentes) y rango (segundas).';
+        }
+    }
+
+    function drawGraphL2(solved) {
+        const canvas = document.getElementById('canvas-l2');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid & Axes
+        ctx.strokeStyle = '#1a1c29';
+        for(let x = 0; x < w; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+        for(let y = 0; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+        const ox = 50, oy = 350, scale = 38;
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(20, oy); ctx.lineTo(w - 20, oy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ox, 20); ctx.lineTo(ox, h - 20); ctx.stroke();
+
+        ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif';
+        for (let i = 1; i <= 8; i++) {
+            ctx.fillText(i, ox + i * scale - 4, oy + 20);
+            ctx.fillText(i, ox - 20, oy - i * scale + 4);
+        }
+
+        if (!solved) {
+            ctx.fillStyle = '#ff007f'; ctx.font = '14px sans-serif';
+            ctx.fillText('Resuelve todos los pasos para visualizar', 70, 180);
+            ctx.fillText('los puntos explícitos de la función f', 80, 205);
+            return;
+        }
+
+        const pts = [
+            { x: l2Data.xShared, y: l2Data.valY },
+            { x: l2Data.valB, y: l2Data.y3 },
+            { x: l2Data.x3, y: l2Data.valA }
+        ];
+
+        pts.forEach(p => {
+            const px = ox + p.x * scale, py = oy - p.y * scale;
+            ctx.fillStyle = '#ff007f';
+            ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowColor = '#ff007f'; ctx.shadowBlur = 12; ctx.fill(); ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`(${p.x};${p.y})`, px + 8, py - 8);
+        });
+    }
+
+    window.onload = function() {
+        generateLevel1();
+    };
+</script>
+
+</body>
+</html>
